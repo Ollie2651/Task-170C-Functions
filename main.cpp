@@ -14,6 +14,14 @@ DigitalIn Button(USER_BUTTON);
 void setLatch(uint8_t dat, char col);
 void led_init(uint8_t dat, bool enabled);
 int getDelayMS();
+int getPatternRed();
+int getPatternGreen();
+int RedLightsPatterns[] = {0b00000011, 0b00001100, 0b00110000, 0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b11111111};
+int GreenLightsPatterns[] = {0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b00001100, 0b00110000, 0b1100000, 0b11111111};
+int BlueLightsPatterns[] = {0b00011000, 0b00100100, 0b01000010, 0b10000001, 0b01000010, 0b00100100, 0b00011000, 0b11111111};
+int RedPattern;
+int GreenPattern;
+int BluePattern;
 
 int main()
 {
@@ -21,18 +29,27 @@ int main()
     
     while(Button == 0);
     
+    for(int i = 0; i < 8; i++) {
+        printf("Red: %d\n", RedLightsPatterns[i]);
+    }
+
     led_init(0x00, true);
 
-    //Update the red
-    setLatch(0xFF,'r');
+    while(true){
+    for (int i = 0; i < 8; i++) {
+        RedPattern = RedLightsPatterns[i];
+        setLatch(RedPattern,'r');
+    
 
-    //Update the green
-    setLatch(0b10101010, 'g');
+        //Update the green
+        GreenPattern = GreenLightsPatterns[i];
+        setLatch(GreenPattern,'g');
 
-    //Update the blue
-    setLatch(0b11001100, 'b');
+        //Update the blue
+        BluePattern = BlueLightsPatterns[i];
+        setLatch(BluePattern, 'b');
 
-    while(true) {
+
         //Get delay value
         int delay_ms = getDelayMS();
 
@@ -40,15 +57,18 @@ int main()
         LED_BAR_OE = 0;
 
         //Wait
-        wait_us(delay_ms*1000);
+        wait_us(delay_ms*250);
 
         //Disable the latch outputs
         LED_BAR_OE = 1;
+        unsigned int potVal = pot.read_u16();
+        printf("potentiometer value: %d\n", potVal);
 
         //Wait
-        wait_us(delay_ms*1000);
+        wait_us(delay_ms*250);
     }
-
+    int i = 0;
+    }
 }
 
 void setLatch(uint8_t dat, char col)
@@ -121,5 +141,14 @@ int getDelayMS()
     return delay;
 }
 
+/*int getPatternRed() 
+{
+    for(int i = 0; i < 7; i++) {
+        int RedPattern = RedLightsPatterns[i];
+        wait_us(1000000);
+        return RedPattern;
+    }
+}
+*/
 
 
