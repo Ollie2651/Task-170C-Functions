@@ -17,10 +17,11 @@ void setLatch(uint8_t dat, char col);
 void led_init(uint8_t dat, bool enabled);
 int getDelayMS();
 int getPatternRed();
+int PatternAt(int index);
 
 /* --------------------------------- Arrays --------------------------------- */
-int RedLightsPatterns[] = {0b00000011, 0b00001100, 0b00110000, 0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b11111111};
-int GreenLightsPatterns[] = {0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b00001100, 0b00110000, 0b1100000, 0b11111111};
+int RedLightsPatterns[8];
+int GreenLightsPatterns[8];
 int BlueLightsPatterns[] = {0b00011000, 0b00100100, 0b01000010, 0b10000001, 0b01000010, 0b00100100, 0b00011000, 0b11111111};
 
 /* ---------------------------- declare variables --------------------------- */
@@ -31,9 +32,27 @@ int BluePattern;
 int main()
 {
     printf("Functions demo\n");
-    
+
     while(Button == 0); // wait until user button is pressed
     
+    /* ------------------------ get numbers for red array ----------------------- */
+    for (int i = 0; i < 4; i++) {
+        RedLightsPatterns[i] = PatternAt(i);
+    }
+    for (int i = 4; i < 7; i++) {
+        RedLightsPatterns[i] = PatternAt(6 - i);
+    }
+    RedLightsPatterns[7] = 0b11111111;
+
+    /* ----------------------- get numbers for green array ---------------------- */
+    for (int i = 0; i < 4; i++) {
+        GreenLightsPatterns[i] = PatternAt(3 - i);
+    }
+    for (int i = 4; i < 7; i++) {
+        GreenLightsPatterns[i] = PatternAt(i - 3);
+    }
+    GreenLightsPatterns[7] = 0b11111111;
+
     /* -------------------------- test the first array -------------------------- */
     for(int i = 0; i < 8; i++) {
         printf("Red: %d\n", RedLightsPatterns[i]);
@@ -152,6 +171,16 @@ int getDelayMS()
     float p = pot; // 0 ... 1
     int delay = 100 + 900*p;    //100...1000ms
     return delay;
+}
+
+int PatternAt(int index)
+{
+    int o = 0b00000011;
+    for(int i = 0; i < index; i++)
+    {
+        o <<= 2;
+    }
+    return o;
 }
 
 
