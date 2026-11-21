@@ -1,8 +1,9 @@
+/* -------------------------------- includes -------------------------------- */
 #include "main.h"
 #include "mbed.h"
 #include "uop_msb.h"
 
-// LED Bar Display
+/* ------------------------ declare whats in and out ------------------------ */
 BusOut dataBits(LED_D0_PIN, LED_D1_PIN, LED_D2_PIN, LED_D3_PIN, LED_D4_PIN, LED_D5_PIN, LED_D6_PIN, LED_D7_PIN);
 DigitalOut LED_BAR_OE(LED_BAR_OE_PIN,1);
 DigitalOut LED_RED_LE(LED_RED_LE_PIN);
@@ -11,14 +12,18 @@ DigitalOut LED_BLUE_LE(LED_BLUE_LE_PIN);
 AnalogIn pot(AN_POT_PIN);
 DigitalIn Button(USER_BUTTON);
 
+/* -------------------------------- Functions ------------------------------- */
 void setLatch(uint8_t dat, char col);
 void led_init(uint8_t dat, bool enabled);
 int getDelayMS();
 int getPatternRed();
-int getPatternGreen();
+
+/* --------------------------------- Arrays --------------------------------- */
 int RedLightsPatterns[] = {0b00000011, 0b00001100, 0b00110000, 0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b11111111};
 int GreenLightsPatterns[] = {0b11000000, 0b00110000, 0b00001100, 0b00000011, 0b00001100, 0b00110000, 0b1100000, 0b11111111};
 int BlueLightsPatterns[] = {0b00011000, 0b00100100, 0b01000010, 0b10000001, 0b01000010, 0b00100100, 0b00011000, 0b11111111};
+
+/* ---------------------------- declare variables --------------------------- */
 int RedPattern;
 int GreenPattern;
 int BluePattern;
@@ -27,46 +32,54 @@ int main()
 {
     printf("Functions demo\n");
     
-    while(Button == 0);
+    while(Button == 0); // wait until user button is pressed
     
+    /* -------------------------- test the first array -------------------------- */
     for(int i = 0; i < 8; i++) {
         printf("Red: %d\n", RedLightsPatterns[i]);
     }
-
-    led_init(0x00, true);
-
+    
+    led_init(0x00, true); // turn on the LEDs
+    
+    /* -------------------------------------------------------------------------- */
+    /*                                  main loop                                 */
+    /* -------------------------------------------------------------------------- */
     while(true){
-    for (int i = 0; i < 8; i++) {
-        RedPattern = RedLightsPatterns[i];
-        setLatch(RedPattern,'r');
+    
+        //repeated loop to access all the patterns for the latches from the arrays
+        for (int i = 0; i < 8; i++) {
+        
+            RedPattern = RedLightsPatterns[i]; // get the pattern from the red array
+            setLatch(RedPattern,'r'); // call the function to set the pattern
     
 
-        //Update the green
-        GreenPattern = GreenLightsPatterns[i];
-        setLatch(GreenPattern,'g');
+            //Update the green
+            GreenPattern = GreenLightsPatterns[i]; // get the pattern from the green array
+            setLatch(GreenPattern,'g'); // call the function to set the pattern
 
-        //Update the blue
-        BluePattern = BlueLightsPatterns[i];
-        setLatch(BluePattern, 'b');
+            //Update the blue
+            BluePattern = BlueLightsPatterns[i]; // get the pattern from the blue array
+            setLatch(BluePattern, 'b'); // call the function to set the pattern
 
 
-        //Get delay value
-        int delay_ms = getDelayMS();
+            //Get delay value
+            int delay_ms = getDelayMS();
 
-        //Enable all the LED BAR Latch Outputs
-        LED_BAR_OE = 0;
+            //Enable all the LED BAR Latch Outputs
+            LED_BAR_OE = 0;
 
-        //Wait
-        wait_us(delay_ms*250);
+            //Wait
+            wait_us(delay_ms*250);
 
-        //Disable the latch outputs
-        LED_BAR_OE = 1;
-        unsigned int potVal = pot.read_u16();
-        printf("potentiometer value: %d\n", potVal);
+            //Disable the latch outputs
+            LED_BAR_OE = 1;
+            /* ------------------------ show potentiometer value ------------------------ */
+            unsigned int potVal = pot.read_u16();
+            printf("potentiometer value: %d\n", potVal);
 
-        //Wait
-        wait_us(delay_ms*250);
-    }
+            //Wait
+            wait_us(delay_ms*250);
+        }
     int i = 0;
     }
 }
@@ -80,7 +93,7 @@ void setLatch(uint8_t dat, char col)
 
     //Now follow the sequence
     wait_us(1);
-    dataBits = dat;    //Set the 8-bit data pattern
+    dataBits = dat; //Set the 8-bit data pattern
     wait_us(1);
 
     //Depending on the chosen colour
@@ -141,6 +154,11 @@ int getDelayMS()
     return delay;
 }
 
+
+/* -------------------------------------------------------------------------- */
+/*               try at using functions for getting the patterns              */
+/* -------------------------------------------------------------------------- */
+
 /*int getPatternRed() 
 {
     for(int i = 0; i < 7; i++) {
@@ -150,5 +168,9 @@ int getDelayMS()
     }
 }
 */
+
+/* -------------------------------------------------------------------------- */
+/*                i want to do this but i just dont know how to               */
+/* -------------------------------------------------------------------------- */
 
 
